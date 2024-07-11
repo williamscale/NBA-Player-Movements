@@ -9,3 +9,4 @@ class Player:
         self.x = player[2]
         self.y = player[3]
         self.color = self.team.color
+
