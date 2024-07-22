@@ -15,6 +15,7 @@ def unnest_event(info):
 		print("No moments logged in event.")
 		return np.empty([1, 1]), pd.DataFrame()
 
+	quarter_m = []
 	game_clock_m = []
 	shot_clock_m = []
 	ball_x_m = []
@@ -27,6 +28,7 @@ def unnest_event(info):
 	for i in m:
 		i_dict = i.__dict__
 
+		quarter_m.append(i_dict["quarter"])
 		game_clock_m.append(i_dict["game_clock"])
 		shot_clock_m.append(i_dict["shot_clock"])
 		ball_x_m.append(i_dict["ball"].__dict__["x"])
@@ -62,14 +64,14 @@ def unnest_event(info):
 	player_x_arr = np.array(player_x_m)
 	player_y_arr = np.array(player_y_m)
 
-	event_arr_ball = np.column_stack((game_clock_m, shot_clock_m, ball_x_m,
-		ball_y_m))
+	event_arr_ball = np.column_stack((quarter_m, game_clock_m, shot_clock_m,
+		ball_x_m, ball_y_m))
 	event_arr = np.concatenate((event_arr_ball, player_team_arr,
 		player_id_arr, player_x_arr, player_y_arr),
 		axis = 1
 		)
 
-	cols = ["game_clock", "shot_clock", "ball_x", "ball_y", "player1_team",
+	cols = ["quarter", "game_clock", "shot_clock", "ball_x", "ball_y", "player1_team",
 		"player2_team", "player3_team", "player4_team", "player5_team", 
 		"player6_team", "player7_team", "player8_team", "player9_team", 
 		"player10_team", "player1_id", "player2_id", "player3_id",
@@ -85,11 +87,12 @@ def unnest_event(info):
 
 	return event_arr, event_df
 
-game_json = "./data/games/0021500502"
+game_json = "./data/games_json/0021500502"
 # a, b = unnest_event(g)
 # print(a)
 # print(b)
-events_list = []
+events_list_df = []
+events_list_arr = []
 event_n = 453 + 1
 for i in range(0, event_n):
 
@@ -97,9 +100,11 @@ for i in range(0, event_n):
 	g_i = Game(path_to_json = game_json + ".json", event_index = i)
 	g_i.read_json()
 	arr_i, df_i = unnest_event(g_i)
-	# events_list.append(df_i)
-	events_list.append(arr_i)
+	events_list_df.append(df_i)
+	events_list_arr.append(arr_i)
 
-with open("events_arr_0021500502" + ".pkl", "wb") as f:
-	pickle.dump(events_list, f)
+# with open("events_df_0021500502" + ".pkl", "wb") as f:
+# 	pickle.dump(events_list_df, f)
+# with open("events_arr_0021500502" + ".pkl", "wb") as f:
+# 	pickle.dump(events_list_arr, f)
 

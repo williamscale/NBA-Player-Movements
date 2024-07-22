@@ -1,2 +1,4 @@
 data/
 __pycache__/
+fga_plots/
+cluster_plots/
