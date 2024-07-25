@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 with open("./data/events/events_dict_0021500013.pkl", "rb") as f:
 	events_dict = pickle.load(f)
 
+import random
+random.seed(55)
+
 basket1 = np.array([4.75, 25])
 basket2 = np.array([94 - 4.75, 25])
 
@@ -67,9 +70,142 @@ for i in events_dict:
 
 events_df = pd.concat([events_dict[i][2] for i in events_dict])
 
+# events_df["ball_speed"].replace([np.inf], np.nan, inplace=True) 
+# events_df.dropna(subset = ["ball_speed"], inplace=True) 
+# plt.boxplot(events_df["ball_speed"])
+# # plt.hist(events_df["ball_speed"], bins = 30, log = True)
+# # plt.xlabel("Ball Speed [ft/s]")
+# plt.ylabel("Ball Speed [ft/s]")
+# plt.savefig("./plots/ballspeed_box.png")
+# plt.show()
+
 events_df = events_df[(events_df["ball_speed"]) <= 50]
+
+# plt.boxplot(events_df["ball_speed"])
+# plt.hist(events_df["ball_speed"])
+# plt.xlabel("Ball Speed [ft/s]")
+# plt.ylabel("Count")
+# plt.savefig("./plots/ballspeed_hist1.png")
+# plt.show()
+
 events_df.dropna(subset = ["fga_theta"], inplace = True)
-events_df.drop_duplicates(subset = ["quarter", "game_clock"], inplace = True)
+events_df.drop_duplicates(
+	subset = ["quarter", "game_clock"],
+	keep = "last",
+	inplace = True
+	)
+
+
+# i = 1650
+# i = 2125
+# i = [2080, 2090]
+# def draw_court(axis):
+#     import matplotlib.image as mpimg
+#     # https://github.com/gmf05/nba/blob/master/image/nba_court_T.png
+#     img = mpimg.imread("./nba_court_T.png") 
+#     plt.imshow(img, extent = axis, zorder = 0)
+
+# events_df["game_clock_min"] = events_df["game_clock"].astype(int) % 3600 // 60
+# events_df["game_clock_sec"] = events_df["game_clock"].astype(int) % 60
+# timestring = "{:01d}:{:02d}"
+# events_df["game_clock_timestring"] = events_df.apply(
+# 	lambda r: timestring.format(r['game_clock_min'], r['game_clock_sec']),
+# 	axis = 1)
+# fig = plt.figure(figsize = (15, 7.5))
+# ax = plt.gca()
+# draw_court([0, 94, 50, 0])
+# plt.axis("off")
+# plt.scatter(
+# 	x = events_df.iloc[i, 3],
+# 	y = events_df.iloc[i, 4],
+# 	c = "orangered",
+# 	s = 100
+# 	)
+# point1 = [1, 2]
+# point2 = [3, 4]
+# r'$\lambda$'
+# x_values = events_df.iloc[i, 3].tolist()
+# y_values = events_df.iloc[i, 4].tolist()
+# x_values.insert(0, 4.75)
+# y_values.insert(0, 25)
+# plt.plot(
+# 	x_values,
+# 	y_values,
+# 	markersize = 10,
+# 	marker = ".",
+# 	color = "orangered",
+# 	linestyle = "solid"
+# 	)
+# plt.text(25, 33, r'$\theta$')
+# plt.show()
+# plt.scatter(
+# 	x = events_df.iloc[i, 7],
+# 	y = events_df.iloc[i, 8],
+# 	c = "#007AC1",
+# 	s = 150
+# 	)
+# plt.scatter(
+# 	x = events_df.iloc[i, 10],
+# 	y = events_df.iloc[i, 11],
+# 	c = "#007AC1",
+# 	s = 150
+# 	)
+# plt.scatter(
+# 	x = events_df.iloc[i, 13],
+# 	y = events_df.iloc[i, 14],
+# 	c = "#007AC1",
+# 	s = 150
+# 	)
+# plt.scatter(
+# 	x = events_df.iloc[i, 16],
+# 	y = events_df.iloc[i, 17],
+# 	c = "#007AC1",
+# 	s = 150
+# 	)
+# plt.scatter(
+# 	x = events_df.iloc[i, 19],
+# 	y = events_df.iloc[i, 20],
+# 	c = "#007AC1",
+# 	s = 150
+# 	)
+# plt.scatter(
+# 	x = events_df.iloc[i, 22],
+# 	y = events_df.iloc[i, 23],
+# 	c = "#000000",
+# 	s = 150
+# 	)
+# plt.scatter(
+# 	x = events_df.iloc[i, 25],
+# 	y = events_df.iloc[i, 26],
+# 	c = "#000000",
+# 	s = 150
+# 	)
+# plt.scatter(
+# 	x = events_df.iloc[i, 28],
+# 	y = events_df.iloc[i, 29],
+# 	c = "#000000",
+# 	s = 150
+# 	)
+# plt.scatter(
+# 	x = events_df.iloc[i, 31],
+# 	y = events_df.iloc[i, 32],
+# 	c = "#000000",
+# 	s = 150
+# 	)
+# plt.scatter(
+# 	x = events_df.iloc[i, 34],
+# 	y = events_df.iloc[i, 35],
+# 	c = "#000000",
+# 	s = 150
+# 	)
+# plt.title("Q" + str(int(events_df.iloc[i, 0])) + " " + str(events_df.iloc[i, 47]))
+# plt.show()
+
+# test = events_df[["quarter", "game_clock", "ball_x", "ball_y",
+# 	"ball_z", "ball_distance", "delta_time", "ball_speed"]]
+# print(test.iloc[25100:25150, :])
+# # print(test.tail(50))
+# y
 
 # clock_repeats = events_df.groupby(["quarter", "game_clock", "shot_clock"]).size().reset_index(name = "n")
 # clock_repeats = clock_repeats[clock_repeats["n"] > 1]
@@ -138,12 +274,13 @@ events_m = scaler.fit_transform(events_m)
 
 # plt.plot(range(1, 15), sse)
 # plt.xticks(range(1, 15))
-# plt.xlabel("Number of Clusters")
+# plt.xlabel("Clusters")
 # plt.ylabel("SSE")
+# plt.savefig("./plots/kmeans_n.png")
 # plt.show()
-# from kneed import KneeLocator
-# kl = KneeLocator(range(1, 15), sse, curve="convex", direction="decreasing")
-# print(kl.elbow)
+# # from kneed import KneeLocator
+# # kl = KneeLocator(range(1, 15), sse, curve="convex", direction="decreasing")
+# # print(kl.elbow)
 
 m = KMeans(
 	init = "random",
@@ -197,7 +334,7 @@ def plot_ball_event(df):
 
 for i in events_dict:
 	plot_ball_event(df = events_df[events_df["event_id"] == i])
-	plt.savefig("./cluster_plots/" + "event_" + i + ".png")
+	plt.savefig("./event_plots/" + "event_" + i + ".png")
 	plt.close()
 
 
@@ -209,7 +346,7 @@ for i in events_dict:
 # faceStreaks = dict(Counter(streaks))
 # print(faceStreaks)
 
-shot_c = 2
+shot_c = 1
 streak_min = 15
 
 streak_idx = []
@@ -233,19 +370,44 @@ for i in range(1, len(streak_idx)):
 
 fga_cluster["fga_id"] = fga_id
 
-# print(fga_cluster[fga_cluster["fga_id"] == 10])
+for i in range(0, 4):
+	df_i = events_df[events_df["cluster"] == i]
+	plot_ball_event(df = df_i)
+	plt.axis("off")
+	plt.title("Cluster " + str(i))
+	plt.savefig("./cluster_plots/cluster_" + str(i) + ".png")
+	plt.close()
 
-plt.scatter(
-	x = events_df[events_df["cluster"] == 2]["ball_x"],
-	y = events_df[events_df["cluster"] == 2]["ball_y"]
-	)
-plt.show()
+# plt.scatter(
+# 	x = events_df[events_df["cluster"] == 0]["ball_x"],
+# 	y = events_df[events_df["cluster"] == 0]["ball_y"]
+# 	)
+# plt.savefig("./cluster_plots/cluster_0.png")
+# plt.show()
+# plt.scatter(
+# 	x = events_df[events_df["cluster"] == 1]["ball_x"],
+# 	y = events_df[events_df["cluster"] == 1]["ball_y"]
+# 	)
+# plt.savefig("./cluster_plots/cluster_1.png")
+# plt.show()
+# plt.scatter(
+# 	x = events_df[events_df["cluster"] == 2]["ball_x"],
+# 	y = events_df[events_df["cluster"] == 2]["ball_y"]
+# 	)
+# plt.savefig("./cluster_plots/cluster_2.png")
+# plt.show()
+# plt.scatter(
+# 	x = events_df[events_df["cluster"] == 3]["ball_x"],
+# 	y = events_df[events_df["cluster"] == 3]["ball_y"]
+# 	)
+# plt.savefig("./cluster_plots/cluster_3.png")
+# plt.show()
 
-plt.scatter(
-	x = fga_cluster["ball_x"],
-	y = fga_cluster["ball_y"]
-	)
-plt.show()
+# plt.scatter(
+# 	x = fga_cluster["ball_x"],
+# 	y = fga_cluster["ball_y"]
+# 	)
+# plt.show()
 
 for i in set(fga_id):
 	plot_ball_event(df = fga_cluster[fga_cluster["fga_id"] == i])
@@ -261,3 +423,9 @@ fga_stamps = fga_cluster.groupby(
 	{"game_clock": ["max", "min"]}
 	)
 print(fga_stamps)
+
+z0 = events_df[events_df["cluster"] == shot_c]["ball_speed"]
+z1 = events_df[events_df["cluster"] != shot_c]["ball_speed"]
+z = [z0, z1]
+plt.boxplot(z)
+plt.show()

@@ -2,3 +2,7 @@ read_7z.py
 extract_data.py
 view.py
 extract_sets.py
+
+read_7z.py
+parser.py
+classify_fga_unsupervised.py
