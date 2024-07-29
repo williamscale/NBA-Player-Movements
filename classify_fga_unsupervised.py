@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 # this is good. go forward with this. possibly add variable, does it hit rim and/or backboard!!
 # hitting backboard may affect fga_theta
 with open("./data/events/events_dict_0021500013.pkl", "rb") as f:
@@ -245,7 +246,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
-events_m = events_df[["fga_theta", "ball_speed", "ball_z"]].to_numpy()
+predictors = ["fga_theta", "ball_speed", "ball_z"]
+
+events_m = events_df[predictors].to_numpy()
 
 scaler = StandardScaler()
 events_m = scaler.fit_transform(events_m)
@@ -419,13 +422,35 @@ for i in set(fga_id):
 # print(fga_dict)
 
 fga_stamps = fga_cluster.groupby(
-	"fga_id").agg(
+	["quarter", "fga_id"]).agg(
 	{"game_clock": ["max", "min"]}
 	)
 print(fga_stamps)
 
-z0 = events_df[events_df["cluster"] == shot_c]["ball_speed"]
-z1 = events_df[events_df["cluster"] != shot_c]["ball_speed"]
-z = [z0, z1]
-plt.boxplot(z)
-plt.show()
+# ex_fga = fga_stamps.sample(n = 5, random_state = 55).index.tolist()
+ex_fga = fga_stamps.sample(n = 5, random_state = 55)
+ex_fga["game_clock_min_max"] = ex_fga["game_clock"]["max"].astype(int) % 3600 // 60
+ex_fga["game_clock_min_min"] = ex_fga["game_clock"]["min"].astype(int) % 3600 // 60
+ex_fga["game_clock_sec_max"] = ex_fga["game_clock"]["max"].astype(int) % 60
+ex_fga["game_clock_sec_min"] = ex_fga["game_clock"]["min"].astype(int) % 60
+print(ex_fga)
+
+# ex_df = fga_cluster[fga_cluster["fga_id"].isin(ex_fga)]
+# ex_df["game_clock_min"] = ex_df["game_clock"].astype(int) % 3600 // 60
+# ex_df["game_clock_sec"] = ex_df["game_clock"].astype(int) % 60
+# timestring = "{:01d}:{:02d}"
+# ex_df["game_clock_timestring"] = ex_df.apply(
+# 	lambda r: timestring.format(r['game_clock_min'], r['game_clock_sec']),
+# 	axis = 1)
+
+# print(ex_df)
+
+for i in predictors:
+	sns.boxplot(x = events_df["cluster"], y = events_df[i])
+	plt.savefig("./plots/box_" + str(i) + ".png")
+	plt.close()
+# z0 = events_df[events_df["cluster"] == shot_c]["ball_speed"]
+# z1 = events_df[events_df["cluster"] != shot_c]["ball_speed"]
+# z = [z0, z1]
+# plt.boxplot(z)
+# plt.show()
