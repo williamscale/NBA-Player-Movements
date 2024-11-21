@@ -227,9 +227,6 @@ clusters = m.labels_.reshape(-1, 1)
 events_m = np.concatenate((clusters, events_m), axis = 1)
 
 events_df["cluster"] = events_m[:, 0]
-print(events_df)
-
-xxx
 
 def draw_court(axis):
     import matplotlib.image as mpimg
@@ -237,7 +234,7 @@ def draw_court(axis):
     img = mpimg.imread("./nba_court_T.png") 
     plt.imshow(img, extent = axis, zorder = 0)
 
-def plot_ball_event(df):
+def plot_ball_event(df, title):
 	# from matplotlib.colors import ListedColormap
 	# colors = ListedColormap(['red', 'blue', 'purple', "green"])
 
@@ -251,26 +248,32 @@ def plot_ball_event(df):
 	# 	c = df["cluster"],
 	# 	cmap = colors
 	# 	)
-	plt.scatter(
+	event_plot = plt.scatter(
 		x = df["ball_x"],
 		y = df["ball_y"],
-		c = df["cluster"]
+		c = df["cluster"],
+		label = df["cluster"]
 		)
+	plt.xticks([])
+	plt.yticks([])
+	plt.title(title)
+	# plt.legend()
 	# plt.axis([0, 100, 50, 0])
-	# plt.legend(*xx.legend_elements())
+	plt.legend(*event_plot.legend_elements())
 
 	# plt.savefig("")
 
 	# plt.show()
 
-
-
-
-# for i in events_dict:
-# 	plot_ball_event(df = events_df[events_df["event_id"] == i])
-# 	plt.savefig("./event_plots/" + "event_" + i + ".png")
-# 	plt.close()
-
+for i in events_dict:
+	df_i = events_df[events_df["event_id"] == i]
+	if len(df_i.index) != 0:
+		plot_ball_event(
+			df = df_i,
+			title = "Event " + i
+			)
+		plt.savefig("./event_plots/" + "event_" + i + ".png")
+		plt.close()
 
 # # from itertools import groupby
 # # from collections import Counter
@@ -304,52 +307,23 @@ for i in range(1, len(streak_idx)):
 
 fga_cluster["fga_id"] = fga_id
 
-# for i in range(0, 4):
-# 	df_i = events_df[events_df["cluster"] == i]
-# 	plot_ball_event(df = df_i)
-# 	plt.axis("off")
-# 	plt.title("Cluster " + str(i))
-# 	plt.savefig("./cluster_plots/cluster_" + str(i) + ".png")
-# 	plt.close()
+for i in range(0, 4):
+	df_i = events_df[events_df["cluster"] == i]
+	plot_ball_event(
+		df = df_i,
+		title = "Cluster " + str(i))
+	plt.axis("off")
+	plt.savefig("./cluster_plots/cluster_" + str(i) + ".png")
+	plt.close()
 
-# # plt.scatter(
-# # 	x = events_df[events_df["cluster"] == 0]["ball_x"],
-# # 	y = events_df[events_df["cluster"] == 0]["ball_y"]
-# # 	)
-# # plt.savefig("./cluster_plots/cluster_0.png")
-# # plt.show()
-# # plt.scatter(
-# # 	x = events_df[events_df["cluster"] == 1]["ball_x"],
-# # 	y = events_df[events_df["cluster"] == 1]["ball_y"]
-# # 	)
-# # plt.savefig("./cluster_plots/cluster_1.png")
-# # plt.show()
-# # plt.scatter(
-# # 	x = events_df[events_df["cluster"] == 2]["ball_x"],
-# # 	y = events_df[events_df["cluster"] == 2]["ball_y"]
-# # 	)
-# # plt.savefig("./cluster_plots/cluster_2.png")
-# # plt.show()
-# # plt.scatter(
-# # 	x = events_df[events_df["cluster"] == 3]["ball_x"],
-# # 	y = events_df[events_df["cluster"] == 3]["ball_y"]
-# # 	)
-# # plt.savefig("./cluster_plots/cluster_3.png")
-# # plt.show()
 
-# # plt.scatter(
-# # 	x = fga_cluster["ball_x"],
-# # 	y = fga_cluster["ball_y"]
-# # 	)
-# # plt.show()
-
-# for i in set(fga_id):
-# 	plot_ball_event(df = fga_cluster[fga_cluster["fga_id"] == i])
-# 	plt.savefig("./fga_plots/" + "fga_" + str(i) + ".png")
-# 	plt.close()
-
-# # fga_dict = {i: None for i in set(fga_cluster["fga_id"])}
-# # print(fga_dict)
+for i in set(fga_id):
+	plot_ball_event(
+		df = fga_cluster[fga_cluster["fga_id"] == i],
+		title = "FGA " + str(i)
+		)
+	plt.savefig("./fga_plots/" + "fga_" + str(i) + ".png")
+	plt.close()
 
 fga_stamps = fga_cluster.groupby(
 	["quarter", "fga_id"]).agg(
@@ -360,54 +334,14 @@ fga_stamps["game_clock_min_max"] = fga_stamps["game_clock"]["max"].astype(int) %
 fga_stamps["game_clock_min_min"] = fga_stamps["game_clock"]["min"].astype(int) % 3600 // 60
 fga_stamps["game_clock_sec_max"] = fga_stamps["game_clock"]["max"].astype(int) % 60
 fga_stamps["game_clock_sec_min"] = fga_stamps["game_clock"]["min"].astype(int) % 60
-print(fga_stamps)
-xxxx
-# def check_fga_class(fga_stamps_df, cluster_df, plot_flag = 1):
-	
-# 	start_times = fga_stamps_df["game_clock"]["max"].tolist()
-# 	end_times = fga_stamps_df["game_clock"]["min"].tolist()
-# 	time_spans = [(start_times[i], end_times[i]) for i in range(0, len(start_times))]
 
-# 	for i in time_spans:
-# 		fga_i = cluster_df[(cluster_df["game_clock"] <= i[0]) & (cluster_df["game_clock"] >= i[1])]
-		
-# 		if plot_flag == 1:
-			# plot_ball_event(df = fga_i)
-			# plt.savefig("./fga_plots/" + "fga_" + str(i) + ".png")
-			# plt.close()
-
-		
-
-
-check_fga_class(fga_stamps_df = fga_stamps, cluster_df = fga_cluster)
-xxx
-print(fga_cluster)
-xxx
-
-# ex_fga = fga_stamps.sample(n = 5, random_state = 55).index.tolist()
 ex_fga = fga_stamps.sample(n = 5, random_state = 55)
 ex_fga["game_clock_min_max"] = ex_fga["game_clock"]["max"].astype(int) % 3600 // 60
 ex_fga["game_clock_min_min"] = ex_fga["game_clock"]["min"].astype(int) % 3600 // 60
 ex_fga["game_clock_sec_max"] = ex_fga["game_clock"]["max"].astype(int) % 60
 ex_fga["game_clock_sec_min"] = ex_fga["game_clock"]["min"].astype(int) % 60
-print(ex_fga)
 
-# # ex_df = fga_cluster[fga_cluster["fga_id"].isin(ex_fga)]
-# # ex_df["game_clock_min"] = ex_df["game_clock"].astype(int) % 3600 // 60
-# # ex_df["game_clock_sec"] = ex_df["game_clock"].astype(int) % 60
-# # timestring = "{:01d}:{:02d}"
-# # ex_df["game_clock_timestring"] = ex_df.apply(
-# # 	lambda r: timestring.format(r['game_clock_min'], r['game_clock_sec']),
-# # 	axis = 1)
-
-# # print(ex_df)
-
-# for i in predictors:
-# 	sns.boxplot(x = events_df["cluster"], y = events_df[i])
-# 	plt.savefig("./plots/box_" + str(i) + ".png")
-# 	plt.close()
-# # z0 = events_df[events_df["cluster"] == shot_c]["ball_speed"]
-# # z1 = events_df[events_df["cluster"] != shot_c]["ball_speed"]
-# # z = [z0, z1]
-# # plt.boxplot(z)
-# # plt.show()
+for i in predictors:
+	sns.boxplot(x = events_df["cluster"], y = events_df[i])
+	plt.savefig("./plots/box_" + str(i) + ".png")
+	plt.close()
